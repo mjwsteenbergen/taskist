@@ -1,8 +1,7 @@
-import React, { PropsWithChildren, useContext, useEffect, useMemo } from "react";
-import { useCallback, useState } from "react";
-import { cachedApi, TodoistProject, TodoistTask } from "./fetch";
-import { OfState } from "./task";
+import React, { PropsWithChildren, useContext, useEffect, useState } from "react";
+import { TodoistTask, cachedApi, TodoistMoveArgs } from "../fetch";
 
+export type OfState<T> = [T, (item: T) => void];
 export const TodoContext = React.createContext<OfState<TodoistTask[]> | undefined>(undefined);
 export const TodoContextProvider = (props: PropsWithChildren<{ v: TodoistTask[] }>) => {
     const [tasks, setTasks] = useState(props.v);
@@ -12,47 +11,21 @@ export const TodoContextProvider = (props: PropsWithChildren<{ v: TodoistTask[] 
     return <TodoContext.Provider value={[tasks, setTasks]}>{props.children}</TodoContext.Provider>
 }
 
-export const updateProject = (id: string, p: Partial<TodoistTask>, val: OfState<TodoistProject[]>) => {
+export const updateTask = (p: Partial<TodoistTask> & Pick<TodoistTask, 'id'>, val: OfState<TodoistTask[]>) => {
     console.log("Sending", p)
     const [items, setItems] = val;
-    const item = items.find(i => i.id === id);
+    const item = items.find(i => i.id === p.id);
     if (item) {
         setItems([...items.filter(i => i !== item), {
             ...item,
             ...p
         }]);
     }
-    return Promise.resolve({} as TodoistTask);
+
+    return cachedApi.updateTask(p);
 }
 
-export const createProject = (p: Partial<TodoistProject>, val: OfState<TodoistProject[]>) => {
-    console.log("Sending", p)
-    const [items, setItems] = val;
-    const newProject: TodoistProject = {
-        id: Math.random().toLocaleString(),
-        name: "assad",
-        order: 1,
-        ...p,
-    };
-    setItems([...items, newProject]);
-    return Promise.resolve({} as TodoistTask);
-}
-
-export const updateTask = (p: Partial<TodoistTask> & Pick<TodoistTask, 'id'>, val: OfState<TodoistTask[]>) => {
-    console.log("Sending", p)
-    const [items, setItems] = val;
-    const item = items.find(i => i.id === p.id);
-    if (item) {        
-        setItems([...items.filter(i => i !== item), {
-            ...item,
-            ...p
-        }]);
-    }
-
-    return cachedApi.update(p);
-}
-
-export const createTask = (p: Partial<TodoistTask> & Pick<TodoistTask, 'project_id' >, val: OfState<TodoistTask[]>) => {
+export const createTask = (p: Partial<TodoistTask> & Pick<TodoistTask, 'project_id'>, val: OfState<TodoistTask[]>) => {
     console.log("Sending", p)
     const [items, setItems] = val;
     return cachedApi.createTask(p).then(i => {
@@ -61,10 +34,14 @@ export const createTask = (p: Partial<TodoistTask> & Pick<TodoistTask, 'project_
     });
 }
 
-function delay<T extends (...args: any) => any>(fn: T, ms: number) {
+type TodoistUpdate = Partial<Omit<TodoistTask, 'is_completed'>>
+export type TodoistUpdateArg = TodoistUpdate & Pick<TodoistTask, "id">;
+
+export function delay<T extends (...args: any) => any>(fn: T, ms: number) {
     let timer = 0
     return function (...args: Parameters<T>) {
         clearTimeout(timer)
+        //@ts-ignore
         timer = setTimeout(fn.bind(this as any, ...args as any), ms || 0)
     }
 }
@@ -112,63 +89,52 @@ export const useTodoContext = (state: OfState<Partial<TodoistTask>>) => {
                 ...i,
             } as TodoistTask;
         })]);
-        
+
     }
+
+    function resetChanges<T>(args: T) {
+        setPendingChanges({
+            changes: [],
+            order: {}
+        })
+        return args;
+    }
+
+    const find = (id: string) => {
+        const todo = items.find(i => i.id === id);
+        if (!todo) {
+            throw new Error("AAA");
+        }
+        return todo;
+    }
+
+
+    const update = then(updateTask, (i: TodoistTask) => resetChanges(i));
+    const delayedUpdate = (task: TodoistUpdateArg) => () => {
+        delay(update, 1000)({ ...task, id: task.id }, val)
+    };
 
     return {
         todos: items,
+        update: delayedUpdate,
         get: (id: string) => {
-            const todo = items.find(i => i.id === id);
-            function resetChanges<T>(args: T) {
-                setPendingChanges({
-                    changes: [],
-                    order: {}
-                })
-                return args;
-            }
-
-            const update = then(updateTask, (i: TodoistTask) => resetChanges(i));
-            const delayedUpdate = useMemo(() => delay(update, 1000), [id]);
-
-            if (!todo) {
-                throw new Error("AAA");
-            }
-
-
+            const todo = find(id);
             return {
                 todo: todo,
                 children: items.filter(i => i.parent_id === todo.id),
-                update: (p: Partial<TodoistTask>) => {
-                    const item = items.find(i => i.id === id);
-                    if (item) {
-                        console.log("hasitem");
-                        setItems([...items.filter(i => i !== item), {
-                            ...item,
-                            ...p
-                        }]);
-                    }
-
-                    const { is_completed, ...rest } = p;
-
-                    if (is_completed !== undefined) {
-                        if (is_completed) {
-                            cachedApi.complete(p.id ?? todo.id);
-                        } else {
-                            cachedApi.uncomplete(p.id ?? todo.id);
-                        }
-                        return;
-                    }
-
-                    delayedUpdate({
-                        id: todo.id,
-                        ...rest
-                    }, val)
+                update: (p: TodoistUpdate) => updateTask({
+                    ...p,
+                    id: todo.id
+                }, val),
+                move: (t: TodoistMoveArgs) => {
+                    setNewItems(t);
+                    cachedApi.moveTask(t);
                 },
                 moveUp: () => {
                     const up = items
                         .filter(i => i.project_id === todo.project_id && i.parent_id === todo.parent_id && todo.id !== i.id)
                         .reduce<TodoistTask | undefined>((closest, item) => (todo.order - item.order > 0) && (item.order > (closest?.order ?? Number.MIN_SAFE_INTEGER)) ? item : closest, undefined)
-                    
+
                     const options = items
                         .filter(i => i.project_id === todo.project_id && i.parent_id === todo.parent_id);
 
@@ -215,6 +181,17 @@ export const useTodoContext = (state: OfState<Partial<TodoistTask>>) => {
                             order: todo.order
                         })
                     }
+                },
+                complete: () => {
+                    if (todo.is_completed) {
+                        cachedApi.uncomplete(todo.id);
+                    } else {
+                        cachedApi.complete(todo.id);
+                    }
+                    setNewItems({
+                        id: todo.id,
+                        is_completed: !todo.is_completed
+                    })
                 }
             }
         },
@@ -222,52 +199,3 @@ export const useTodoContext = (state: OfState<Partial<TodoistTask>>) => {
     }
 }
 
-export const ProjectContext = React.createContext<OfState<TodoistProject[]> | undefined>(undefined);
-export const ProjectContextProvider = (props: PropsWithChildren<{ v: TodoistProject[] }>) => {
-    const [state, setState] = useState(props.v);
-    useEffect(() => {
-        cachedApi.getProjects().then(i => setState(i));
-    }, []);
-    return <ProjectContext.Provider value={[state, setState]}>{props.children}</ProjectContext.Provider>
-}
-
-export const useProjectContext = (state: OfState<Partial<TodoistProject>>) => {
-    const [changes, setChanges] = state;
-    const val = useContext(ProjectContext);
-    if (!val) {
-        throw new Error("AAA");
-    }
-
-    const [projects] = val;
-
-    return {
-        projects,
-        get: (id: string) => {
-            const project = projects.find(i => i.id === id);
-
-            if (!project) {
-                throw new Error("AAA");
-            }
-
-            const delayedUpdate = delay(updateProject, 200);
-            const delayedCreate = createProject;
-
-            return {
-                project: {
-                    ...project,
-                    ...changes
-                },
-                children: projects.filter(i => i.parent_id === project.id),
-                update: (p: Partial<TodoistProject>) => {
-                    const fullChanges = {
-                        ...changes,
-                        ...p
-                    };
-                    setChanges(fullChanges);
-                    delayedUpdate(project.id, p, val)
-                },
-                create: (p: Partial<TodoistProject>) => then(delayedCreate, focus)(p, val)
-            }
-        }
-    }
-}

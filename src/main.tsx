@@ -1,15 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import "./assets/index.css";
-import { RootProjects } from './task';
-import { ProjectContextProvider, TodoContextProvider } from './updates';
+import { ProjectContextProvider } from './context/project';
+import { SectionContextProvider } from './context/section';
+import { TodoContextProvider } from './context/task';
+import { Tasks } from './items';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <div className={'flex h-screen items-stretch justify-center'}>
+    <div className={'flex h-screen items-center justify-around flex-col'}>
       <TodoContextProvider v={[]}>
         <ProjectContextProvider v={[]}>
-          <RootProjects/>
+          <SectionContextProvider v={[]}>
+            <Tasks />
+          </SectionContextProvider>
         </ProjectContextProvider>
       </TodoContextProvider>
     </div>
