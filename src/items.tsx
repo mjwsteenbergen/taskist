@@ -22,8 +22,8 @@ export const Tasks = () => {
     const projects_project = projects.find(i => i.name === "Projects");
     const projects_projects = projects.filter(i => i.parent_id === projects_project?.id);
 
-    const working_on = todos.filter(i => inProgress.includes(i.section_id) && !i.labels.includes(WAITING_FOR));
-    const ready = todos.filter(i => ready_sections.includes(i.section_id));
+    const working_on = todos.filter(i => inProgress.includes(i.section_id ?? "") && !i.labels.includes(WAITING_FOR));
+    const ready = todos.filter(i => ready_sections.includes(i.section_id ?? ""));
     const overdue = todos.filter(i => Date.parse(i.due?.date ?? Date.now().toString()) < Date.now())
     const waiting_for = todos.filter(i => i.labels.includes(WAITING_FOR));
     const next_up = todos.filter(i => i.section_id === null && projects_projects.some(j => j.id === i.project_id));
@@ -45,8 +45,8 @@ export const Tasks = () => {
             <h2 className="text-5xl">Ready to Pickup</h2>
             <ul>
                 {ready.map(i => {
-                    const { moveToInProgress, addWaitingFor, complete } = methods_for(i);
-                    return <Task key={i.id} task={i} onUp={moveToInProgress} onWaiting={addWaitingFor} onComplete={complete} />
+                    const { moveToInProgress, addWaitingFor, complete, backToDefaultSection } = methods_for(i);
+                    return <Task key={i.id} task={i} onDown={backToDefaultSection} onUp={moveToInProgress} onWaiting={addWaitingFor} onComplete={complete} />
                 })}
             </ul>
         </> : ""}
@@ -92,6 +92,13 @@ const getMethods = () => {
         const { update, move, complete } = get(t.id);
     
         return {
+            backToDefaultSection: () => {
+                t.section_id = undefined;
+                move({
+                    id: t.id,
+                    project_id: t.project_id
+                })
+            },
             moveToReadyToPickUp: async () => {
                 const sections = sectionsOfProject(t.project_id);
                 let readyToPickUpSection = sections.find(i => i.name === READY_TO_PICKUP)

@@ -14,7 +14,7 @@ export type TodoistTask = {
     is_completed: boolean;
     order: number;
     project_id: string;
-    section_id: string;
+    section_id?: string;
     parent_id?: string | null;
     due: TodoistTaskDue | null;
     priority: 1 | 2 | 3 | 4;
@@ -130,9 +130,9 @@ export const api = {
 }
 
 export const cachedApi = {
-    getTasks: cache(api.getTasks, 30),
-    getProjects: cache(api.getProjects, 30),
-    getSections: cache(api.getSections, 30),
+    getTasks: cache(api.getTasks, 0),
+    getProjects: cache(api.getProjects, 0),
+    getSections: cache(api.getSections, 0),
     createTask: api.createTask,
     updateTask: api.updateTask,
     createSection: api.createSection,

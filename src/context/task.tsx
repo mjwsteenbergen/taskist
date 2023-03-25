@@ -127,8 +127,8 @@ export const useTodoContext = (state: OfState<Partial<TodoistTask>>) => {
                     id: todo.id
                 }, val),
                 move: (t: TodoistMoveArgs) => {
-                    setNewItems(t);
                     cachedApi.moveTask(t);
+                    setNewItems(t);
                 },
                 moveUp: () => {
                     const up = items
