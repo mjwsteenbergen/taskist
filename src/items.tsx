@@ -150,7 +150,7 @@ const Task = ({ task, variant, onUp, onDown, onWaiting, onComplete }: Props) => 
     const project = projects.find(j => j.id === task.project_id);
 
 
-    const textSize = variant === 'big' ? "text-8xl h-32" : "text-6xl h-24 ";
+    const textSize = variant === 'big' ? "text-2xl md:text-5xl md:h-20 3xl:text-8xl 3xl:h-32" : "text-xl md:h-16 md:text-4xl 3xl:text-6xl 3xl:h-24 ";
 
     const prios = {
         1: "",
