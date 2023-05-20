@@ -8,7 +8,7 @@ import { Tasks } from './items';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <div className={'flex h-screen items-center justify-around flex-col'}>
+    <div className={'grid h-screen content-center w-screen overflow-hidden justify-center'}>
       <TodoContextProvider v={[]}>
         <ProjectContextProvider v={[]}>
           <SectionContextProvider v={[]}>

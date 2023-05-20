@@ -29,7 +29,7 @@ export const Tasks = () => {
     const next_up = todos.filter(i => i.section_id === null && projects_projects.some(j => j.id === i.project_id));
 
 
-    return <div className="flex flex-col justify-center content-around">
+    return <>
         {working_on.length> 0  ? <>
             {/* <h2 className="text-5xl">Working on right now</h2> */}
             <ul className="mb-10">
@@ -81,7 +81,7 @@ export const Tasks = () => {
                 })}
             </ul>
         </> : ""}
-    </div>
+    </>
 }
 
 const getMethods = () => {
@@ -170,7 +170,7 @@ const Task = ({ task, variant, onUp, onDown, onWaiting, onComplete }: Props) => 
 
     const mdLink = new RegExp(/\[(.+)\]\((.+)\)/g).exec(task.content);
     const tdLink = new RegExp(/(https?:\/\/[^ ]+) \((.+)\)/g).exec(task.content);
-    let textClasses = "leading-tight mb-0 truncate max-w-[1500px]";
+    let textClasses = "leading-tight mb-0 truncate";
     let text = <p className={textClasses}>{task.content}</p>
     if (mdLink ?? tdLink) {
         const { link, linktext } = mdLink ? {
@@ -184,9 +184,9 @@ const Task = ({ task, variant, onUp, onDown, onWaiting, onComplete }: Props) => 
         text = <a target='_blank' className={textClasses + " reset text-gray-300 dark:text-gray-500"} href={link}>{linktext}</a>
     }
 
-    return <li className={"flex gap-3 items-center overflow-hidden hover:overflow-visible relative group " + textSize}>
+    return <li className={"grid grid-cols-[auto_minmax(0,1fr)_auto_auto] grid-flow-col gap-3 items-center overflow-hidden hover:overflow-visible relative group " + textSize}>
         <span onClick={onComplete} className={"cursor-pointer  " + boxColor}>{task.is_completed ? "☑" : "☐"}</span>
-        <div className="flex flex-col justify-center content-center">
+        <div className="flex flex-col justify-center content-center flex-shrink">
             {text}
             <div className="extra-bar transition-all duration-200 h-auto flex gap-2">
                 <Badge name={"#" + project?.name ?? ""} color={project?.color} link={"https://todoist.com/app/project/" + project?.id} />

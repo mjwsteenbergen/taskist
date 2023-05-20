@@ -64,7 +64,17 @@ function createArg(type: TodoistCommand['type'], args: TodoistCommand['args']): 
 const baseUrl = "https://api.todoist.com";
 const baseRestUrl = baseUrl + "/rest/v2/";
 const baseSyncUrl = baseUrl + "/sync/v9/";
-const token = window.localStorage.getItem("todoist_key");
+
+const getToken = () => {
+    const token = window.localStorage.getItem("todoist_key");
+
+    if (!token) {
+        const requestedToken = window.prompt("Enter todoist key");
+        window.localStorage.setItem("todoist_key", requestedToken ?? "");
+    }
+    return token;
+}
+const token = getToken();
 const auth = {
     "Authorization": "Bearer " + token
 }
