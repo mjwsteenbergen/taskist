@@ -162,9 +162,9 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
             const json = window.localStorage.getItem("cache." + func.name);
             if (json) {
                 const c = JSON.parse(json) as cacheItem<Y>;
-                resolve(c.item);
                 if ((Date.now() - c.added) / 1000 < waitForS) {
                     console.debug("getting from cache: " + func.name);
+                    resolve(c.item);
                     return;     
                 }
             }
@@ -178,6 +178,9 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
             }).catch((err) => {
                 if (!json) {
                     reject(err);
+                } else {
+                    const c = JSON.parse(json) as cacheItem<Y>;
+                    resolve(c.item);
                 }
             });
         });
