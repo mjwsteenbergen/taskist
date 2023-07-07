@@ -6,16 +6,16 @@ import { SectionContextProvider } from './context/section';
 import { TodoContextProvider } from './context/task';
 import { Tasks } from './items';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementsByTagName('body')[0]).render(
   <React.StrictMode>
-    <div className={'grid h-screen content-center w-screen overflow-hidden justify-center'}>
-      <TodoContextProvider v={[]}>
-        <ProjectContextProvider v={[]}>
-          <SectionContextProvider v={[]}>
-            <Tasks />
-          </SectionContextProvider>
-        </ProjectContextProvider>
-      </TodoContextProvider>
-    </div>
+    <div className='grid min-h-screen content-center justify-center my-8'>
+        <TodoContextProvider v={[]}>
+          <ProjectContextProvider v={[]}>
+            <SectionContextProvider v={[]}>
+              <Tasks />
+            </SectionContextProvider>
+          </ProjectContextProvider>
+        </TodoContextProvider>
+      </div>
   </React.StrictMode>,
 )
