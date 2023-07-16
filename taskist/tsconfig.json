@@ -17,6 +17,6 @@
     "jsx": "react-jsx"
   },
   "include": ["src"],
-  "exclude": ["src/assets"],
+  "exclude": ["src/assets", "design-system"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
