@@ -1,8 +1,0 @@
-.extra-bar {
-    max-height: 0;
-    overflow: hidden;
-}
-
-li:hover .extra-bar {
-    max-height: 10vh;
-}

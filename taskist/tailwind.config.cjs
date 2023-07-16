@@ -5,6 +5,6 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   presets: [
-    require('./design-system/tailwind.config.cjs')
+    require('../design-system/tailwind.config.cjs')
   ],
 }

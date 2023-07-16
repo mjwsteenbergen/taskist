@@ -1,25 +1,19 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import "./assets/index.css";
-import { ProjectContextProvider } from './context/project';
-import { SectionContextProvider } from './context/section';
-import { TodoContextProvider } from './context/task';
-import { Tasks } from './items';
-import { Main } from './srcv2/main';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './assets/index.css';
+import { App } from './app';
+import { TodoContextProvider } from './context/TodoContext';
+import { SectionContextProvider } from './context/SectionContext';
+import { ProjectContextProvider } from './context/ProjectContext';
 
 ReactDOM.createRoot(document.getElementsByTagName('body')[0]).render(
   <React.StrictMode>
-        <Main/>
-  </React.StrictMode>,
-)
-
-  // < div className = 'grid min-h-screen content-center justify-center py-8' >
-
-  // < TodoContextProvider v = { []} >
-  //   <ProjectContextProvider v={[]}>
-  //     <SectionContextProvider v={[]}>
-  //       <Tasks />
-  //     </SectionContextProvider>
-  //   </ProjectContextProvider>
-  //       </TodoContextProvider >
-    // </div >
+    <TodoContextProvider>
+      <SectionContextProvider>
+        <ProjectContextProvider>
+          <App />
+        </ProjectContextProvider>
+      </SectionContextProvider>
+    </TodoContextProvider>
+  </React.StrictMode>
+);

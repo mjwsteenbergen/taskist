@@ -51,7 +51,7 @@ export type TodoistMoveArgs = {
     section_id?: TodoistSection['id']
 }
 
-type createArgsType<T> = T extends CommandOf<infer Y, infer Z> ? [Y,Z] : never 
+type createArgsType<T> = T extends CommandOf<infer Y, infer Z> ? [Y, Z] : never
 
 function createArg(type: TodoistCommand['type'], args: TodoistCommand['args']): TodoistCommand {
     return {
@@ -80,9 +80,9 @@ const auth = {
 }
 export const api = {
     getTasks: () => fetch(baseRestUrl + "tasks", {
-            headers: auth
-        }).then(i => i.json())
-            .then(i => i as TodoistTask[]),
+        headers: auth
+    }).then(i => i.json())
+        .then(i => i as TodoistTask[]),
     getProjects: () => fetch(baseRestUrl + "projects", {
         headers: auth
     }).then(i => i.json()).then(i => i as TodoistProject[]),
@@ -140,9 +140,9 @@ export const api = {
 }
 
 export const cachedApi = {
-    getTasks: cache(api.getTasks, 0),
-    getProjects: cache(api.getProjects, 0),
-    getSections: cache(api.getSections, 0),
+    getTasks: cache(api.getTasks, 500),
+    getProjects: cache(api.getProjects, 500),
+    getSections: cache(api.getSections, 500),
     createTask: api.createTask,
     updateTask: api.updateTask,
     createSection: api.createSection,
@@ -165,7 +165,7 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
                 if ((Date.now() - c.added) / 1000 < waitForS) {
                     console.debug("getting from cache: " + func.name);
                     resolve(c.item);
-                    return;     
+                    return;
                 }
             }
 
@@ -185,6 +185,23 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
             });
         });
     }
-    
-    
+
+
+}
+
+export function cached<Y, Arg>(func: (...args: Arg[]) => Promise<Y>) {
+    return () => {
+        const json = window.localStorage.getItem("cache." + func.name);
+        if (json) {
+            const c = JSON.parse(json) as cacheItem<Y>;
+            return c.item;
+        }
+        return undefined;
+    }
+}
+
+export const onlyCachedApi = {
+    getTasks: cached(api.getTasks),
+    getProjects: cached(api.getProjects),
+    getSections: cached(api.getSections)
 }
