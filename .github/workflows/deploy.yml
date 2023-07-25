@@ -37,7 +37,7 @@ jobs:
         run: (cd design-system/components && npm install)
 
       - name: Install Taskist
-        run: (cd taskist && npm install)
+        run: (cd taskist && npm install && npm link)
 
       - name: Build project
         run: (cd taskist && npm run build)
