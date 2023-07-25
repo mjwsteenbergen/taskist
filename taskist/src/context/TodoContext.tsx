@@ -13,7 +13,7 @@ export const TodoContext = React.createContext<
 export const TodoContextProvider = (props: PropsWithChildren<{}>) => {
   const [tasks, setTasks] = useState(onlyCachedApi.getTasks() ?? []);
   useEffect(() => {
-    // cachedApi.getTasks().then(i => i && setTasks(i))
+    cachedApi.getTasks().then((i) => i && setTasks(i));
   }, []);
   return (
     <TodoContext.Provider value={[tasks, setTasks]}>
