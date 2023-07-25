@@ -56,7 +56,7 @@ type createArgsType<T> = T extends CommandOf<infer Y, infer Z> ? [Y, Z] : never
 function createArg(type: TodoistCommand['type'], args: TodoistCommand['args']): TodoistCommand {
     return {
         type,
-        uuid: crypto.randomUUID(),
+        uuid: self.crypto.randomUUID(),
         args
     }
 }
