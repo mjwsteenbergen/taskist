@@ -34,10 +34,10 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Install Design System
-        run: (cd design-system && npm install)
+        run: (cd ../design-system && npm install)
 
       - name: Install Taskist
-        run: (cd taskist && npm install)
+        run: (cd .. && npm install)
 
       - name: Build project
         run: (cd taskist && npm run build)
