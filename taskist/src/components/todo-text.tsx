@@ -31,7 +31,7 @@ export const TodoText = ({ text, big }: { text: string; big?: boolean }) => {
         target="_blank"
         className={variant({
           big,
-          className: 'reset text-gray-300 dark:text-gray-500',
+          className: 'reset text-gray-300 dark:text-gray-100',
         })}
         href={link}
       >
