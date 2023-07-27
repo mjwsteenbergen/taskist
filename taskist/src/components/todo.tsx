@@ -79,28 +79,3 @@ export const Todo = ({
     </div>
   );
 };
-
-{
-  /* <div className={componentWrapperVariant({ big })}>
-  <Checkbox classname={checkboxVariant({ big })} />
-  <div className={contentWrapperVariant({ big })}>
-    <TodoText big={big} text={name} />
-    <div className="gap-x-2 hidden group-hover:flex">
-      {onMoveDown && (
-        <Badge onClick={onMoveDown}>
-          <NavArrowDown />
-        </Badge>
-      )}
-      {onMoveUp && (
-        <Badge onClick={onMoveUp}>
-          <NavArrowUp />
-        </Badge>
-      )}
-      {onWaitingFor && <Badge onClick={onWaitingFor}>🕐</Badge>}
-      {(tags ?? []).map((i) => (
-        <Badge name={i.text} link={i.url} />
-      ))}
-    </div>
-  </div>
-</div>; */
-}
