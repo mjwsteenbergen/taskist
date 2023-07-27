@@ -1,5 +1,6 @@
 {
   "image":"mcr.microsoft.com/devcontainers/universal:2",
+  "postCreateCommand": "git submodule update --init && cd design-system && git checkout master && cd ..",
   "customizations": {
     "codespaces": {
       "repositories": {
