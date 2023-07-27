@@ -48,12 +48,7 @@ export const App = () => {
             onMoveUp={moveToInProgress}
             onComplete={complete}
           />
-          <TaskSection
-            name="Waiting For"
-            tasks={waiting_for()}
-            onWaitingFor={removeWaitingFor}
-            onComplete={complete}
-          />
+          
         </div>
         {/* {!isScrying && (
           <button
@@ -66,9 +61,15 @@ export const App = () => {
       </div>
       {/* {isScrying && ( */}
       <div
-        className="bg-gray-50 min-h-screen grid justify-center content-center py-8"
+        className="bg-gray-50 dark:bg-gray-700 min-h-screen grid justify-center content-center py-8"
         ref={ref}
       >
+        <TaskSection
+            name="Waiting For"
+            tasks={waiting_for()}
+            onWaitingFor={removeWaitingFor}
+            onComplete={complete}
+          />
         <div className="grid content-center max-w-max grow">
           <TaskSection
             name="Overdue"
