@@ -4,10 +4,8 @@
   "customizations": {
     "codespaces": {
       "repositories": {
-        "mjwsteenbergen/*": {
-          "permissions": {
-            "permissions": "write-all"
-          }
+        "mjwsteenbergen/design-system": {
+          "permissions": "write-all"
         }
       }
     }
