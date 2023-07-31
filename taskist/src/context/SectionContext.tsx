@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import { TodoistSection, api, onlyCachedApi } from '../fetch';
+import { TodoistSection, usedApi, onlyCachedApi } from '../fetch';
 
 export type OfState<T> = [T, (item: T) => void];
 export const SectionContext = React.createContext<
@@ -13,7 +13,7 @@ export const SectionContext = React.createContext<
 export const SectionContextProvider = (props: PropsWithChildren<{}>) => {
   const [sections, setSections] = useState(onlyCachedApi.getSections() ?? []);
   useEffect(() => {
-    api.getSections().then((i) => i && setSections(i));
+    usedApi.getSections().then((i) => i && setSections(i));
   }, []);
   return (
     <SectionContext.Provider value={[sections, setSections]}>

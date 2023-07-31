@@ -189,6 +189,8 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
 
 }
 
+export const usedApi = (import.meta.env.DEV ? cachedApi : api);
+
 export function cached<Y, Arg>(func: (...args: Arg[]) => Promise<Y>) {
     return () => {
         const json = window.localStorage.getItem("cache." + func.name);

@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import { TodoistProject, api, onlyCachedApi } from '../fetch';
+import { TodoistProject, usedApi, onlyCachedApi } from '../fetch';
 
 export type OfState<T> = [T, (item: T) => void];
 export const ProjectContext = React.createContext<
@@ -13,7 +13,7 @@ export const ProjectContext = React.createContext<
 export const ProjectContextProvider = (props: PropsWithChildren<{}>) => {
   const [projects, setProjects] = useState(onlyCachedApi.getProjects() ?? []);
   useEffect(() => {
-    api.getProjects().then((i) => i && setProjects(i));
+    usedApi.getProjects().then((i) => i && setProjects(i));
   }, []);
   return (
     <ProjectContext.Provider value={[projects, setProjects]}>
