@@ -28,6 +28,12 @@ const ready_sections = (sections: TodoistSection[]) =>
   sections.filter((i) => i.name === READY_TO_PICKUP).map((i) => i.id);
 const inProgress_sections = (sections: TodoistSection[]) =>
   sections.filter((i) => i.name === IN_PROGRESS);
+const sectionHasName = (name: string, sections: TodoistSection[]) => sections.filter((i) => i.name === name);
+const tasksInSection = (tasks: TodoistTask[], sections: TodoistSection[]) => {
+  console.log(sections)
+  const sectionIds = sections.map(i => i.id);
+  return tasks.filter(i => sectionIds.includes(i.section_id ?? ""));
+}
 
 const projects_project = (projects: TodoistProject[]) =>
   projects.find((i) => i.name === 'Projects');
@@ -137,11 +143,12 @@ export const useTodoPageSections = () => {
       ),
     waiting_for: () => todos.filter((i) => i.labels.includes(WAITING_FOR)),
     next_up: () =>
-      todos.filter(
+      [...new Set(tasksInSection(todos, sectionHasName("Next Up", sections)).concat(todos.filter(
         (i) =>
           i.section_id === null &&
           projects_projects(projects).some((j) => j.id === i.project_id)
-      ),
+      )))],
+
     inProgress: () =>
       todos
         .filter((i) =>
