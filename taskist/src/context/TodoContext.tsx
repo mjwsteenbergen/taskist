@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import { TodoistTask, cachedApi, onlyCachedApi } from '../fetch';
+import { TodoistTask, api, onlyCachedApi } from '../fetch';
 
 export type OfState<T> = [T, (item: T) => void];
 export const TodoContext = React.createContext<
@@ -13,7 +13,7 @@ export const TodoContext = React.createContext<
 export const TodoContextProvider = (props: PropsWithChildren<{}>) => {
   const [tasks, setTasks] = useState(onlyCachedApi.getTasks() ?? []);
   useEffect(() => {
-    cachedApi.getTasks().then((i) => i && setTasks(i));
+    api.getTasks().then((i) => i && setTasks(i));
   }, []);
   return (
     <TodoContext.Provider value={[tasks, setTasks]}>
