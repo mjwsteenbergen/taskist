@@ -1,6 +1,17 @@
-import { useRef, useState } from 'react';
-import { useTodoPageSections } from './hooks/useTodoPageSections';
-import { TaskSection } from './components/task-section';
+import { useRef, useState } from "react";
+import { useTodoPageSections } from "./hooks/useTodoPageSections";
+import { TaskSection } from "./components/task-section";
+import { Button } from "design-system-components/src/button/Button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  TextInput,
+} from "design-system-components/src";
+import { Plus } from "iconoir-react";
+import { api } from "./fetch";
 
 export const App = () => {
   const [isScrying, setIsScrying] = useState(false);
@@ -18,16 +29,6 @@ export const App = () => {
     removeWaitingFor,
     complete,
   } = useTodoPageSections();
-
-  const enableScrying = () => {
-    setIsScrying(true);
-  };
-
-  //   useEffect(() => {
-  //     ref.current?.scrollIntoView({
-  //       behavior: 'smooth',
-  //     });
-  //   }, [isScrying]);
 
   return (
     <>
@@ -48,28 +49,28 @@ export const App = () => {
             onMoveUp={moveToInProgress}
             onComplete={complete}
           />
-          
         </div>
-        {/* {!isScrying && (
-          <button
-            className="place-self-end justify-self-start lg:fixed bottom-6 right-6"
-            onClick={enableScrying}
-          >
-            <NavArrowDown />
-          </button>
-        )} */}
+        <Dialog>
+          <DialogTrigger>
+            <Button rounded className="absolute right-7 bottom-7">
+              <Plus />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <AddTodo />
+          </DialogContent>
+        </Dialog>
       </div>
-      {/* {isScrying && ( */}
       <div
         className="bg-gray-50 dark:bg-gray-700 min-h-screen grid justify-center content-center py-8"
         ref={ref}
       >
         <TaskSection
-            name="Waiting For"
-            tasks={waiting_for()}
-            onWaitingFor={removeWaitingFor}
-            onComplete={complete}
-          />
+          name="Waiting For"
+          tasks={waiting_for()}
+          onWaitingFor={removeWaitingFor}
+          onComplete={complete}
+        />
         <div className="grid content-center max-w-max grow">
           <TaskSection
             name="Overdue"
@@ -86,6 +87,35 @@ export const App = () => {
         </div>
       </div>
       {/* )} */}
+    </>
+  );
+};
+
+export const AddTodo = () => {
+  const [text, setText] = useState("");
+  return (
+    <>
+      <DialogHeader>
+        <h3>Add a new todo item</h3>
+      </DialogHeader>
+
+      <TextInput
+        id="text"
+        label="Todo Description"
+        onChange={(e) => {
+          setText(e.currentTarget.value);
+        }}
+      ></TextInput>
+      <DialogClose
+        className="reset justify-self-end"
+        onClick={() => {
+          api.createTask({
+            content: text,
+          });
+        }}
+      >
+        <Button>Create</Button>
+      </DialogClose>
     </>
   );
 };
