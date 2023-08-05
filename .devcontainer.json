@@ -3,8 +3,8 @@
   "postCreateCommand": [
     "git submodule update --init",
     "cd design-system && git checkout master && cd ..",
-    "cd design-system && npm install",
-    "cd taskist && npm install"
+    "(cd design-system/components && npm install)",
+    "(cd taskist && npm install)"
   ],
   "customizations": {
     "codespaces": {
