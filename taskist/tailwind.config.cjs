@@ -7,4 +7,7 @@ module.exports = {
   presets: [
     require('../design-system/tailwind.config.cjs')
   ],
+  plugins: [
+		require("tailwindcss-animate"),
+	],
 }
