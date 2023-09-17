@@ -65,91 +65,95 @@ const baseUrl = "https://api.todoist.com";
 const baseRestUrl = baseUrl + "/rest/v2/";
 const baseSyncUrl = baseUrl + "/sync/v9/";
 
-const getToken = () => {
-    const token = window.localStorage.getItem("todoist_key");
-
-    if (!token) {
-        const requestedToken = window.prompt("Enter todoist key");
-        window.localStorage.setItem("todoist_key", requestedToken ?? "");
+export const getApi = (token: string) => {
+    const auth = {
+        "Authorization": "Bearer " + token
     }
-    return token;
-}
-const token = getToken();
-const auth = {
-    "Authorization": "Bearer " + token
-}
-export const api = {
-    getTasks: () => fetch(baseRestUrl + "tasks", {
-        headers: auth
-    }).then(i => i.json())
-        .then(i => i as TodoistTask[]),
-    getProjects: () => fetch(baseRestUrl + "projects", {
-        headers: auth
-    }).then(i => i.json()).then(i => i as TodoistProject[]),
-    getSections: () => fetch(baseRestUrl + "sections", {
-        headers: auth
-    }).then(i => i.json()).then(i => i as TodoistSection[]),
-    createTask: (p: Partial<TodoistTask>) => fetch(baseRestUrl + "tasks", {
-        headers: {
-            ...auth,
-            "Content-Type": "application/json"
-        },
-        method: 'post',
-        body: JSON.stringify(p)
-    }).then(i => i.json()).then(i => i as TodoistTask),
-    updateTask: (fullPartial: Partial<TodoistTask> & Pick<TodoistTask, 'id'>) => {
-        const { id, ...rest } = fullPartial;
-        return fetch(baseRestUrl + "tasks/" + id, {
+    
+    const api = {
+        getTasks: () => fetch(baseRestUrl + "tasks", {
+            headers: auth
+        }).then(i => i.json())
+            .then(i => i as TodoistTask[]),
+        getProjects: () => fetch(baseRestUrl + "projects", {
+            headers: auth
+        }).then(i => i.json()).then(i => i as TodoistProject[]),
+        getSections: () => fetch(baseRestUrl + "sections", {
+            headers: auth
+        }).then(i => i.json()).then(i => i as TodoistSection[]),
+        createTask: (p: Partial<TodoistTask>) => fetch(baseRestUrl + "tasks", {
             headers: {
                 ...auth,
                 "Content-Type": "application/json"
             },
             method: 'post',
-            body: JSON.stringify(rest)
-        }).then(i => i.json()).then(i => i as TodoistTask)
-    },
-    complete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/close", {
-        headers: {
-            ...auth,
-            "Content-Type": "application/json"
+            body: JSON.stringify(p)
+        }).then(i => i.json()).then(i => i as TodoistTask),
+        updateTask: (fullPartial: Partial<TodoistTask> & Pick<TodoistTask, 'id'>) => {
+            const { id, ...rest } = fullPartial;
+            return fetch(baseRestUrl + "tasks/" + id, {
+                headers: {
+                    ...auth,
+                    "Content-Type": "application/json"
+                },
+                method: 'post',
+                body: JSON.stringify(rest)
+            }).then(i => i.json()).then(i => i as TodoistTask)
         },
-        method: 'post',
-    }),
-    uncomplete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/reopen", {
-        headers: {
-            ...auth,
-            "Content-Type": "application/json"
-        },
-        method: 'post',
-    }),
-    createSection: (p: Partial<TodoistSection> & Pick<TodoistSection, "name" | "project_id">) => fetch(baseRestUrl + "sections", {
-        headers: {
-            ...auth,
-            "Content-Type": "application/json"
-        },
-        method: 'post',
-        body: JSON.stringify(p)
-    }).then(i => i.json()).then(i => i as TodoistSection),
-    sync: (commands: TodoistCommand[]) => fetch(baseSyncUrl + "sync?commands=" + encodeURIComponent(JSON.stringify(commands)), {
-        headers: {
-            ...auth,
-            "Content-Type": "application/json"
-        },
-    }),
-    moveTask: (args: TodoistMoveArgs) => api.sync([createArg("item_move", args)])
+        complete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/close", {
+            headers: {
+                ...auth,
+                "Content-Type": "application/json"
+            },
+            method: 'post',
+        }),
+        uncomplete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/reopen", {
+            headers: {
+                ...auth,
+                "Content-Type": "application/json"
+            },
+            method: 'post',
+        }),
+        createSection: (p: Partial<TodoistSection> & Pick<TodoistSection, "name" | "project_id">) => fetch(baseRestUrl + "sections", {
+            headers: {
+                ...auth,
+                "Content-Type": "application/json"
+            },
+            method: 'post',
+            body: JSON.stringify(p)
+        }).then(i => i.json()).then(i => i as TodoistSection),
+        sync: (commands: TodoistCommand[]) => fetch(baseSyncUrl + "sync?commands=" + encodeURIComponent(JSON.stringify(commands)), {
+            headers: {
+                ...auth,
+                "Content-Type": "application/json"
+            },
+        }),
+        moveTask: (args: TodoistMoveArgs) => api.sync([createArg("item_move", args)])
+    }
+
+    const cachedApi = {
+        getTasks: cache(api.getTasks, 500),
+        getProjects: cache(api.getProjects, 500),
+        getSections: cache(api.getSections, 500),
+        createTask: api.createTask,
+        updateTask: api.updateTask,
+        createSection: api.createSection,
+        complete: api.complete,
+        uncomplete: api.uncomplete,
+        moveTask: api.moveTask,
+    }
+
+    const usedApi = (import.meta.env.DEV ? cachedApi : api);
+
+    const onlyCachedApi = {
+        getTasks: cached(api.getTasks),
+        getProjects: cached(api.getProjects),
+        getSections: cached(api.getSections)
+    }
+
+    return { api: usedApi, onlyCachedApi };
 }
 
-export const cachedApi = {
-    getTasks: cache(api.getTasks, 500),
-    getProjects: cache(api.getProjects, 500),
-    getSections: cache(api.getSections, 500),
-    createTask: api.createTask,
-    updateTask: api.updateTask,
-    createSection: api.createSection,
-    complete: api.complete,
-    uncomplete: api.uncomplete,
-    moveTask: api.moveTask,
-}
 
 type cacheItem<Y> = {
     item: Y;
@@ -189,7 +193,6 @@ export function cache<Y, Arg>(func: (...args: Arg[]) => Promise<Y>, waitForS: nu
 
 }
 
-export const usedApi = (import.meta.env.DEV ? cachedApi : api);
 
 export function cached<Y, Arg>(func: (...args: Arg[]) => Promise<Y>) {
     return () => {
@@ -202,8 +205,3 @@ export function cached<Y, Arg>(func: (...args: Arg[]) => Promise<Y>) {
     }
 }
 
-export const onlyCachedApi = {
-    getTasks: cached(api.getTasks),
-    getProjects: cached(api.getProjects),
-    getSections: cached(api.getSections)
-}
