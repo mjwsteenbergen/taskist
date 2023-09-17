@@ -4,16 +4,18 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import { TodoistProject, usedApi, onlyCachedApi } from '../fetch';
+import { TodoistProject } from '../fetch';
+import { useTodoistApiContext } from './TodoistApiContext';
 
 export type OfState<T> = [T, (item: T) => void];
 export const ProjectContext = React.createContext<
   OfState<TodoistProject[]> | undefined
 >(undefined);
 export const ProjectContextProvider = (props: PropsWithChildren<{}>) => {
+  const { api, onlyCachedApi} = useTodoistApiContext();
   const [projects, setProjects] = useState(onlyCachedApi.getProjects() ?? []);
   useEffect(() => {
-    usedApi.getProjects().then((i) => i && setProjects(i));
+    api.getProjects().then((i) => i && setProjects(i));
   }, []);
   return (
     <ProjectContext.Provider value={[projects, setProjects]}>
