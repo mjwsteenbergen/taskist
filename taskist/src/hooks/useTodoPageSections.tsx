@@ -2,12 +2,11 @@ import {
   TodoistProject,
   TodoistSection,
   TodoistTask,
-  api,
-  cachedApi,
 } from '../fetch';
 import { useProjectContext } from '../context/ProjectContext';
 import { useSectionContext } from '../context/SectionContext';
 import { useTodoContext } from '../context/TodoContext';
+import { useTodoistApiContext } from '../context/TodoistApiContext';
 
 const IN_PROGRESS = 'In Progress';
 const READY_TO_PICKUP = 'Ready To Pickup';
@@ -23,7 +22,19 @@ export function then<Y, Z, P extends any[]>(
   };
 }
 
-const notWaitingFor = (i: TodoistTask) => !i.labels.includes(WAITING_FOR);
+
+
+export const useTodoPageSections = () => {
+  const [todos, setTodos] = useTodoContext();
+  const [sections, setSections] = useSectionContext();
+  const [projects, setProjects] = useProjectContext();
+  const { api: todoistApi } = useTodoistApiContext()
+
+  const refreshTodos = () => {
+    todoistApi.getTasks().then((i) => setTodos(i));
+  };
+
+  const notWaitingFor = (i: TodoistTask) => !i.labels.includes(WAITING_FOR);
 const ready_sections = (sections: TodoistSection[]) =>
   sections.filter((i) => i.name === READY_TO_PICKUP).map((i) => i.id);
 const inProgress_sections = (sections: TodoistSection[]) =>
@@ -52,7 +63,7 @@ const projectOfTask = (task: TodoistTask, projects: TodoistProject[]) => {
 
 const backToDefaultSection = (task: TodoistTask) => {
   task.section_id = undefined;
-  return cachedApi.moveTask({
+  return  todoistApi.moveTask({
     id: task.id,
     project_id: task.project_id,
   });
@@ -68,12 +79,12 @@ const moveToReadyToPickUp = async (
     (i) => i.name === READY_TO_PICKUP
   );
   if (!readyToPickUpSection) {
-    readyToPickUpSection = await cachedApi.createSection({
+    readyToPickUpSection = await  todoistApi.createSection({
       name: READY_TO_PICKUP,
       project_id: task.project_id,
     });
   }
-  return cachedApi.moveTask({
+  return  todoistApi.moveTask({
     id: task.id,
     section_id: readyToPickUpSection.id,
   });
@@ -89,12 +100,12 @@ const moveToInProgress = async (
     (i) => i.name === IN_PROGRESS
   );
   if (!readyToPickUpSection) {
-    readyToPickUpSection = await cachedApi.createSection({
+    readyToPickUpSection = await  todoistApi.createSection({
       name: IN_PROGRESS,
       project_id: task.project_id,
     });
   }
-  return cachedApi.moveTask({
+  return  todoistApi.moveTask({
     id: task.id,
     section_id: readyToPickUpSection.id,
   });
@@ -102,37 +113,29 @@ const moveToInProgress = async (
 
 const toggleComplete = (todo: TodoistTask) => {
   if (todo.is_completed) {
-    return cachedApi.uncomplete(todo.id);
+    return  todoistApi.uncomplete(todo.id);
   } else {
-    return cachedApi.complete(todo.id);
+    return  todoistApi.complete(todo.id);
   }
 };
 
 const addWaitingFor = (task: TodoistTask) => {
-  return cachedApi.updateTask({
+  return  todoistApi.updateTask({
     id: task.id,
     labels: [...task.labels, WAITING_FOR],
   });
 };
 
 const removeWaitingFor = (task: TodoistTask) => {
-  return cachedApi.updateTask({
+  return  todoistApi.updateTask({
     id: task.id,
     labels: task.labels.filter((i) => i !== WAITING_FOR),
   });
 };
 
-export const useTodoPageSections = () => {
-  const [todos, setTodos] = useTodoContext();
-  const [sections, setSections] = useSectionContext();
-  const [projects, setProjects] = useProjectContext();
-
-  const refreshTodos = () => {
-    api.getTasks().then((i) => setTodos(i));
-  };
-
   return {
     todos,
+    projectOfTask: (task: TodoistTask) => projects.find(i => i.id === task.project_id),
     ready: () =>
       todos
         .filter((i) => ready_sections(sections).includes(i.section_id ?? ''))

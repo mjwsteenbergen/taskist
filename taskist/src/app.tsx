@@ -11,10 +11,9 @@ import {
   TextInput,
 } from "design-system-components/src";
 import { Plus } from "iconoir-react";
-import { api } from "./fetch";
+import { useTodoistApiContext } from "./context/TodoistApiContext";
 
 export const App = () => {
-  const [isScrying, setIsScrying] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const {
     inProgress,
@@ -93,6 +92,7 @@ export const App = () => {
 
 export const AddTodo = () => {
   const [text, setText] = useState("");
+  const { api } = useTodoistApiContext();
   return (
     <>
       <DialogHeader>
