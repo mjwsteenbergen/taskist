@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+import { MouseEvent } from "react";
 
 const variant = cva('mb-0 truncate max-w-[calc(100vw - 6rem)]', {
   variants: {
@@ -26,6 +27,12 @@ export const TodoText = ({ text, big }: { text: string; big?: boolean }) => {
           linktext: tdLink?.[2],
         };
 
+    function onClickHandler(event: MouseEvent<HTMLAnchorElement, MouseEvent>): void {
+      if(event.ctrlKey || event.metaKey) {
+        
+      }
+    }
+
     return (
       <a
         target="_blank"
@@ -34,6 +41,7 @@ export const TodoText = ({ text, big }: { text: string; big?: boolean }) => {
           className: 'reset text-gray-300 dark:text-gray-100',
         })}
         href={link}
+        onClick={onClickHandler}
       >
         {linktext}
       </a>

@@ -1,5 +1,5 @@
 import { VariantProps, cva } from "class-variance-authority";
-import { MouseEventHandler, PropsWithChildren } from "react";
+import { MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 
 const map = {
   berry_red: "bg-red-200",
@@ -35,25 +35,25 @@ const variant = cva("text-xs p-1 pt-[6px] px-2 rounded-md text-white flex", {
     },
     color: {
       berry_red: "bg-red-200",
-      // "light_blue": "#96c3eb",
+      "light_blue": "#96c3eb",
       red: "bg-red-200",
       blue: "bg-blue-400",
-      // "orange": "#ff9933",
-      // "grape": "#884dff",
-      // "yellow": "#fad000",
-      // "violet": "#af38eb",
-      // "olive_green": "#afb83b",
-      // "lavender": "#eb96eb",
-      // "lime_green": "#7ecc49",
-      // "magenta": "#e05194",
-      // "green": "#299438",
-      // "salmon": "#ff8d85",
-      // "mint_green": "#6accbc",
-      // "charcoal": "#808080",
-      // "teal": "#158fad",
-      // "grey": "#b8b8b8",
-      // "sky_blue": "#14aaf5",
-      // "taupe": "#ccac93",
+      "orange": "bg-red-100",
+      "grape": "#884dff",
+      "yellow": "#fad000",
+      "violet": "#af38eb",
+      "olive_green": "#afb83b",
+      "lavender": "#eb96eb",
+      "lime_green": "#7ecc49",
+      "magenta": "#e05194",
+      "green": "#299438",
+      "salmon": "#ff8d85",
+      "mint_green": "#6accbc",
+      "charcoal": "bg-gray-300",
+      "teal": "#158fad",
+      "grey": "bg-gray-100",
+      "sky_blue": "bg-blue-400",
+      "taupe": "bg-gray-200",
     },
   },
   defaultVariants: {
@@ -62,7 +62,7 @@ const variant = cva("text-xs p-1 pt-[6px] px-2 rounded-md text-white flex", {
 });
 
 type PProps = {
-  name?: string;
+  name?: ReactNode;
   color?: VariantProps<typeof variant>["color"];
   link?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;

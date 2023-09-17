@@ -1,11 +1,14 @@
 import Checkbox from 'design-system-components/src/checkbox';
-import { NavArrowDown, NavArrowUp } from 'iconoir-react';
+import { NavArrowDown, NavArrowUp, ArrowTr, Clock } from 'iconoir-react';
 import { Badge } from './badge';
 import { TodoText } from './todo-text';
 import { cva } from 'class-variance-authority';
+import { TodoistProject } from '../fetch';
 
 type TodoProps = {
   name: string;
+  link?: string;
+  projects?: TodoistProject;
   onWaitingFor?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -44,8 +47,10 @@ const componentWrapperVariant = cva('group flex items-center h-20', {
 
 export const Todo = ({
   name,
+  link,
   tags,
   big,
+  projects: project,
   onMoveDown,
   onMoveUp,
   onWaitingFor,
@@ -60,6 +65,7 @@ export const Todo = ({
       <div className="">
         <TodoText big={big} text={name} />
         <div className="gap-x-2 overflow-hidden flex max-h-0 group-hover:max-h-12 transition-all duration-150">
+          {project && <Badge name={project.name} color={(project.color ?? "red") as any} link={"https://todoist.com/app/project/" + project.id}/>}
           {onMoveDown && (
             <Badge onClick={onMoveDown}>
               <NavArrowDown />
@@ -70,10 +76,11 @@ export const Todo = ({
               <NavArrowUp />
             </Badge>
           )}
-          {onWaitingFor && <Badge onClick={onWaitingFor}>🕐</Badge>}
+          {onWaitingFor && <Badge onClick={onWaitingFor}><Clock height={15}/></Badge>}
           {(tags ?? []).map((i) => (
             <Badge name={i.text} link={i.url} />
           ))}
+          {link && <Badge name={<ArrowTr height={15}/>} link={link}/>}
         </div>
       </div>
     </div>

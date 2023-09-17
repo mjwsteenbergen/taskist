@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { TodoistTask } from '../fetch';
 import { Todo } from './todo';
+import { useTodoPageSections } from '../hooks/useTodoPageSections';
 
 export const Header = ({
   children,
@@ -30,6 +31,7 @@ export const TaskSection = ({
     return null;
   }
 
+  const {projectOfTask} = useTodoPageSections();
   return (
     <section>
       {name && <Header>{name}</Header>}
@@ -37,8 +39,10 @@ export const TaskSection = ({
         return (
           <Todo
             name={i.content}
+            link={i.url}
             big={big}
             key={i.id}
+            projects={projectOfTask(i)}
             onWaitingFor={onWaitingFor && (() => onWaitingFor(i))}
             onMoveDown={onMoveDown && (() => onMoveDown(i))}
             onMoveUp={onMoveUp && (() => onMoveUp(i))}
