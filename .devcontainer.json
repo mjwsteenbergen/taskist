@@ -1,9 +1,7 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "postCreateCommand": [
-    "git submodule update --init",
-    "cd design-system && git checkout master && cd ..",
-    "(cd design-system/components && npm install)",
+    "git submodule update --init && (cd design-system && git checkout master) && (cd design-system/components && npm install)",
     "(cd taskist && npm install)"
   ],
   "customizations": {
