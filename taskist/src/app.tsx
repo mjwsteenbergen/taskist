@@ -32,6 +32,12 @@ export const App = () => {
             moveDown="ready-to-pickup"
           />
           <TaskSection
+            name="Ready to pickup"
+            tasks={readyToPickupTasks}
+            moveDown="back-to-default"
+            moveUp="move-to-in-progress"
+          />
+          <TaskSection
             name="Overdue"
             tasks={overdueTasks}
             moveUp="ready-to-pickup"
@@ -53,18 +59,12 @@ export const App = () => {
         className="bg-gray-50 dark:bg-gray-700 min-h-screen grid justify-center content-center py-8"
         ref={ref}
       >
-        <TaskSection
-            name="Ready to pickup"
-            tasks={readyToPickupTasks}
-            moveDown="back-to-default"
-            moveUp="move-to-in-progress"
-          />
+        
         <TaskSection
           name="Waiting For"
           tasks={waitingForTasks}
           showWaitingFor
         />
-        <div className="grid content-center max-w-max grow">
           <TaskSection
             name="Overdue"
             tasks={overdueTasks}
@@ -75,7 +75,6 @@ export const App = () => {
             tasks={nextUpTasks}
             moveUp="ready-to-pickup"
           />
-        </div>
       </div>
       {/* )} */}
     </>
