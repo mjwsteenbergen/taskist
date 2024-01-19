@@ -1,5 +1,4 @@
 import { cva } from 'class-variance-authority';
-import { MouseEvent } from "react";
 
 const variant = cva('mb-0 truncate max-w-[calc(100vw - 6rem)]', {
   variants: {

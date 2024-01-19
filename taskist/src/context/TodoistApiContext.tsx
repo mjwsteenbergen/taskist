@@ -7,7 +7,7 @@ import {
 import { Button } from "design-system-components/src/button/Button";
 import React, { useContext, useState } from "react";
 import { PropsWithChildren } from "react";
-import { getApi } from "../fetch";
+import { getApi } from "../todoist/fetch";
 
 export const TodoistApiContext = React.createContext<
   ReturnType<typeof getApi> | undefined

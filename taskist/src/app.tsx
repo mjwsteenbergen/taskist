@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { useTodoPageSections } from "./hooks/useTodoPageSections";
 import { TaskSection } from "./components/task-section";
 import { Button } from "design-system-components/src/button/Button";
 import {
@@ -11,23 +10,17 @@ import {
   TextInput,
 } from "design-system-components/src";
 import { Plus } from "iconoir-react";
-import { useTodoistApiContext } from "./context/TodoistApiContext";
+import { useInProgressTasks, useNextUpTasks, useOverdueTasks, useReadyToPickupTasks, useWaitingForTasks } from "./hooks/aggregateTodoistHooks";
+import { useCreateTodoMutation } from "./hooks/todoistHooks";
 
 export const App = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const {
-    inProgress,
-    ready,
-    waiting_for,
-    overdue,
-    next_up,
-    moveToReadyToPickUp,
-    moveToInProgress,
-    backToDefaultSection,
-    addWaitingFor,
-    removeWaitingFor,
-    complete,
-  } = useTodoPageSections();
+
+  const inProgressTasks = useInProgressTasks();
+  const nextUpTasks = useNextUpTasks();
+  const overdueTasks = useOverdueTasks();
+  const waitingForTasks = useWaitingForTasks();
+  const readyToPickupTasks = useReadyToPickupTasks();
 
   return (
     <>
@@ -35,19 +28,15 @@ export const App = () => {
         <div className="grid max-w-[-webkit-fill-available] overflow-hidden grow content-around">
           <TaskSection
             big
-            tasks={inProgress()}
-            onWaitingFor={addWaitingFor}
-            onMoveDown={moveToReadyToPickUp}
-            onComplete={complete}
+            tasks={inProgressTasks}
+            moveDown="ready-to-pickup"
           />
           <TaskSection
-            name="Ready to pickup"
-            tasks={ready()}
-            onWaitingFor={addWaitingFor}
-            onMoveDown={backToDefaultSection}
-            onMoveUp={moveToInProgress}
-            onComplete={complete}
+            name="Overdue"
+            tasks={overdueTasks}
+            moveUp="ready-to-pickup"
           />
+          
         </div>
         <Dialog>
           <DialogTrigger>
@@ -65,23 +54,26 @@ export const App = () => {
         ref={ref}
       >
         <TaskSection
+            name="Ready to pickup"
+            tasks={readyToPickupTasks}
+            moveDown="back-to-default"
+            moveUp="move-to-in-progress"
+          />
+        <TaskSection
           name="Waiting For"
-          tasks={waiting_for()}
-          onWaitingFor={removeWaitingFor}
-          onComplete={complete}
+          tasks={waitingForTasks}
+          showWaitingFor
         />
         <div className="grid content-center max-w-max grow">
           <TaskSection
             name="Overdue"
-            tasks={overdue()}
-            onMoveUp={moveToReadyToPickUp}
-            onComplete={complete}
+            tasks={overdueTasks}
+            moveUp="ready-to-pickup"
           />
           <TaskSection
             name="Next up"
-            tasks={next_up()}
-            onMoveUp={moveToReadyToPickUp}
-            onComplete={complete}
+            tasks={nextUpTasks}
+            moveUp="ready-to-pickup"
           />
         </div>
       </div>
@@ -92,7 +84,8 @@ export const App = () => {
 
 export const AddTodo = () => {
   const [text, setText] = useState("");
-  const { api } = useTodoistApiContext();
+  
+  const { mutate: createTask } = useCreateTodoMutation();
   return (
     <>
       <DialogHeader>
@@ -109,7 +102,7 @@ export const AddTodo = () => {
       <DialogClose
         className="reset justify-self-end"
         onClick={() => {
-          api.createTask({
+          createTask({
             content: text,
           });
         }}

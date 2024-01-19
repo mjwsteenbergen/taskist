@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
-import { TodoistTask } from '../fetch';
-import { Todo } from './todo';
-import { useTodoPageSections } from '../hooks/useTodoPageSections';
+import { MoveOptions, Todo } from './todo';
+import { TodoistTask } from '../todoist/types';
 
 export const Header = ({
   children,
@@ -14,42 +13,33 @@ export const TaskSection = ({
   name,
   tasks,
   big,
-  onWaitingFor,
-  onMoveUp,
-  onMoveDown,
-  onComplete,
+  showWaitingFor,
+  moveDown,
+  moveUp
 }: {
   name?: string;
   big?: boolean;
   tasks: TodoistTask[];
-  onWaitingFor?: (task: TodoistTask) => void;
-  onMoveDown?: (task: TodoistTask) => void;
-  onMoveUp?: (task: TodoistTask) => void;
-  onComplete: (task: TodoistTask) => void;
+  showWaitingFor?: boolean,
+  moveDown?: MoveOptions,
+  moveUp?: MoveOptions,
 }) => {
   if (tasks.length == 0) {
     return null;
   }
 
-  const {projectOfTask} = useTodoPageSections();
   return (
     <section>
       {name && <Header>{name}</Header>}
-      {tasks.map((i) => {
+      {tasks.map((task) => {
         return (
           <Todo
-            name={i.content}
-            link={i.url}
+            task={task}
             big={big}
-            key={i.id}
-            projects={projectOfTask(i)}
-            onWaitingFor={onWaitingFor && (() => onWaitingFor(i))}
-            onMoveDown={onMoveDown && (() => onMoveDown(i))}
-            onMoveUp={onMoveUp && (() => onMoveUp(i))}
-            onComplete={() => onComplete(i)}
-            tags={i.labels.map((i) => ({
-              text: i,
-            }))}
+            key={task.id}
+            showWaitingFor={showWaitingFor}
+            moveDown={moveDown}
+            moveUp={moveUp}
           />
         );
       })}
