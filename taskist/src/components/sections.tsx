@@ -1,4 +1,4 @@
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren, ReactElement, ReactNode, useMemo } from "react";
 import {
   useTodoistTasks,
   useTodoistSections,
@@ -80,29 +80,27 @@ export const InProgressSection = () => {
       .filter(notWaitingFor);
   }, [tasks, sections]);
 
-  return (
-    inProgressTasks.length > 0 && (
-      <TaskSection>
-        {inProgressTasks.map((task) => {
-          return (
-            <Todo big task={task} key={task.id}>
-              <WaitingForBadge task={task} />
-              <MoveToNextUpBadge task={task}>
-                <NavArrowDown />
-              </MoveToNextUpBadge>
-            </Todo>
-          );
-        })}
-      </TaskSection>
-    )
-  );
+  return inProgressTasks.length > 0 ? (
+    <TaskSection>
+      {inProgressTasks.map((task) => {
+        return (
+          <Todo big task={task} key={task.id}>
+            <WaitingForBadge task={task} />
+            <MoveToNextUpBadge task={task}>
+              <NavArrowDown />
+            </MoveToNextUpBadge>
+          </Todo>
+        );
+      })}
+    </TaskSection>
+  ) : null;
 };
 
 export const TodaySection = () => {
   const { data: tasks } = useTodoistTasks();
   const { data: sections } = useTodoistSections();
   if (tasks === undefined) {
-    return [];
+    return null;
   }
   const todayTasks = tasks
     .filter((i) => i.labels.includes(TODAY))
@@ -113,67 +111,61 @@ export const TodaySection = () => {
         )
     );
 
-  return (
-    todayTasks.length > 0 && (
-      <TaskSection name="Today">
-        {todayTasks.map((task) => {
-          return (
-            <Todo task={task} key={task.id}>
-              <ToggleTodayBadge task={task} />
-              <MoveToInProgressBadge task={task} />
-            </Todo>
-          );
-        })}
-      </TaskSection>
-    )
-  );
+  return todayTasks.length > 0 ? (
+    <TaskSection name="Today">
+      {todayTasks.map((task) => {
+        return (
+          <Todo task={task} key={task.id}>
+            <ToggleTodayBadge task={task} />
+            <MoveToInProgressBadge task={task} />
+          </Todo>
+        );
+      })}
+    </TaskSection>
+  ) : null;
 };
 
 export const OverdueSection = () => {
   const { data: tasks } = useTodoistTasks();
   if (tasks === undefined) {
-    return [];
+    return null;
   }
 
   const overDueTasks = tasks.filter(
     (i) => Date.parse(i.due?.date ?? Date.now().toString()) < Date.now()
   );
 
-  return (
-    overDueTasks.length > 0 && (
-      <TaskSection name="Overdue">
-        {overDueTasks.map((task) => {
-          return (
-            <Todo task={task} key={task.id}>
-              <MoveToInProgressBadge task={task} />
-            </Todo>
-          );
-        })}
-      </TaskSection>
-    )
-  );
+  return overDueTasks.length > 0 ? (
+    <TaskSection name="Overdue">
+      {overDueTasks.map((task) => {
+        return (
+          <Todo task={task} key={task.id}>
+            <MoveToInProgressBadge task={task} />
+          </Todo>
+        );
+      })}
+    </TaskSection>
+  ) : null;
 };
 
 export const WaitingForSection = () => {
   const { data: tasks } = useTodoistTasks();
   if (tasks === undefined) {
-    return [];
+    return null;
   }
   const waitingForTasks = tasks.filter((i) => i.labels.includes(WAITING_FOR));
 
-  return (
-    waitingForTasks.length > 0 && (
-      <TaskSection name="Waiting for">
-        {waitingForTasks.map((task) => {
-          return (
-            <Todo task={task} key={task.id}>
-              <WaitingForBadge task={task} />
-            </Todo>
-          );
-        })}
-      </TaskSection>
-    )
-  );
+  return waitingForTasks.length > 0 ? (
+    <TaskSection name="Waiting for">
+      {waitingForTasks.map((task) => {
+        return (
+          <Todo task={task} key={task.id}>
+            <WaitingForBadge task={task} />
+          </Todo>
+        );
+      })}
+    </TaskSection>
+  ) : null;
 };
 
 export const NextUpSection = () => {
@@ -185,7 +177,7 @@ export const NextUpSection = () => {
   };
 
   if (tasks === undefined || sections === undefined) {
-    return [];
+    return <></>;
   }
 
   const nextUpTasks = tasksInSection(
@@ -193,17 +185,15 @@ export const NextUpSection = () => {
     sectionHasName("Next Up", sections)
   ).filter((i) => !i.labels.includes(TODAY));
 
-  return (
-    nextUpTasks.length > 0 && (
-      <TaskSection name="Next up">
-        {nextUpTasks.map((task) => {
-          return (
-            <Todo task={task} key={task.id}>
-              <ToggleTodayBadge task={task} />
-            </Todo>
-          );
-        })}
-      </TaskSection>
-    )
-  );
+  return nextUpTasks.length > 0 ? (
+    <TaskSection name="Next up">
+      {nextUpTasks.map((task) => {
+        return (
+          <Todo task={task} key={task.id}>
+            <ToggleTodayBadge task={task} />
+          </Todo>
+        );
+      })}
+    </TaskSection>
+  ) : null;
 };
