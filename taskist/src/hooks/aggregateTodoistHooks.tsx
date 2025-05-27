@@ -11,17 +11,6 @@ const tasksInSection = (tasks: TodoistTask[], sections: TodoistSection[]) => {
   return tasks.filter(i => sectionIds.includes(i.section_id ?? ""));
 }
 
-export const useRelevantProjects = () => {
-  const { data: projects } = useTodoistProjects();
-  return useMemo(() => {
-    if (projects === undefined) {
-      return [];
-    }
-    const projects_project = projects.find((i) => i.name === 'Projects');
-    return projects.filter((i) => i.parent_id === projects_project?.id)
-  }, [projects])
-}
-
 export const useOverdueTasks = () => {
   const { data: tasks } = useTodoistTasks();
   if (tasks === undefined) {
@@ -35,17 +24,12 @@ export const useOverdueTasks = () => {
 export const useNextUpTasks = () => {
   const { data: tasks } = useTodoistTasks();
   const { data: sections } = useTodoistSections();
-  const relevantProjects = useRelevantProjects();
 
   if (tasks === undefined || sections === undefined) {
     return [];
   }
 
-  return [...new Set(tasksInSection(tasks, sectionHasName("Next Up", sections)).concat(tasks.filter(
-    (i) =>
-      i.section_id === null &&
-      relevantProjects.some((j) => j.id === i.project_id)
-  )))]
+  return [...new Set(tasksInSection(tasks, sectionHasName("Next Up", sections)))]
 }
 
 export const useInProgressTasks = () => {
