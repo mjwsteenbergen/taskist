@@ -2,6 +2,9 @@ import { cva } from 'class-variance-authority';
 
 const variant = cva('mb-0 truncate max-w-[calc(100vw - 6rem)]', {
   variants: {
+    isCompleted: {
+      true: "line-through"
+    },
     big: {
       true: 'text-4xl lg:text-9xl font-title !leading-[1.2]',
       false: 'lg:text-5xl',
@@ -12,7 +15,7 @@ const variant = cva('mb-0 truncate max-w-[calc(100vw - 6rem)]', {
   },
 });
 
-export const TodoText = ({ text, big }: { text: string; big?: boolean }) => {
+export const TodoText = ({ text, big, isCompleted }: { text: string; big?: boolean, isCompleted: boolean }) => {
   const mdLink = new RegExp(/\[(.+)\]\((.+)\)/g).exec(text);
   const tdLink = new RegExp(/(https?:\/\/[^ ]+) \((.+)\)/g).exec(text);
   if (mdLink ?? tdLink) {
@@ -30,6 +33,7 @@ export const TodoText = ({ text, big }: { text: string; big?: boolean }) => {
       <a
         target="_blank"
         className={variant({
+          isCompleted,
           big,
           className: 'reset text-gray-300 dark:text-gray-100',
         })}

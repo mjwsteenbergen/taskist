@@ -4,7 +4,11 @@ import { TodoistMoveArgs, TodoistTask } from "../todoist/types";
 
 export const IN_PROGRESS = 'In Progress';
 export const READY_TO_PICKUP = 'Ready To Pickup';
+export const NEXT_UP = 'Ready To Pickup';
 export const WAITING_FOR = 'waiting-for';
+export const TODAY = 'today';
+export const TOMORROW = 'tomorrow';
+export const YESTERDAY = 'yesterday';
 
 export const useTodoistTasks = () => {
     const api = useTodoistApiContext();
@@ -26,7 +30,7 @@ export const BASE_TASK: TodoistTask = {
     priority: 4,
 }
 
-export const optimisticallyUpdateTask = async (queryClient: QueryClient, newTask: Partial<TodoistTask>) => {
+export const optimisticallyUpdateTask = async (queryClient: QueryClient, newTask: Partial<TodoistTask> & Pick<TodoistTask, "id">) => {
     // Cancel any outgoing refetches
     // (so they don't overwrite our optimistic update)
     await queryClient.cancelQueries({ queryKey: ['tasks'] })
@@ -38,12 +42,6 @@ export const optimisticallyUpdateTask = async (queryClient: QueryClient, newTask
     queryClient.setQueryData(['tasks'], (old: TodoistTask[]) => {
         const oldTask = old.find(i => i.id == newTask.id) ?? {};
         const withoutOld = old.filter(i => i !== oldTask);
-
-        console.log({
-            oldTask: oldTask,
-            newTask: newTask,
-            old: old
-        })
 
         return [...withoutOld, {
             ...BASE_TASK,
@@ -65,12 +63,6 @@ export const useCreateTodoMutation = () => {
         onSettled: () => queryClient.invalidateQueries({
             queryKey: ["tasks"]
         }),
-        onMutate: async (task) => {
-            await optimisticallyUpdateTask(queryClient, {
-                ...task,
-            })
-        }
-
     })
 }
 
@@ -109,17 +101,27 @@ export const useMoveTask = (task: TodoistMoveArgs) => {
     });
 }
 
-export const useRemovingWaitingForMutation = (task: TodoistTask) => {
+export const useToggleLabelMutation = (task: TodoistTask, label: string) => {
+    const remove = useRemoveLabelMutation(task, label);
+    const add = useAddLabelMutation(task, label)
+    if(task.labels.includes(label)) {
+        return remove;
+    } else {
+        return add; 
+    }
+}
+
+export const useRemoveLabelMutation = (task: TodoistTask, label: string) => {
     return useUpdateTask({
         id: task.id,
-        labels: task.labels.filter((i) => i !== WAITING_FOR),
+        labels: task.labels.filter((i) => i !== label),
     })
 }
 
-export const useAddWaitingForMutation = (task: TodoistTask) => {
+export const useAddLabelMutation = (task: TodoistTask, label: string) => {
     return useUpdateTask({
         id: task.id,
-        labels: [...task.labels, WAITING_FOR],
+        labels: [...task.labels, label],
     })
 }
 
@@ -134,6 +136,7 @@ export const useCompleteTaskMutation = (task: TodoistTask) => {
         }),
         onMutate: async () => {
             await optimisticallyUpdateTask(queryClient, {
+                id: task.id,
                 is_completed: true
             })
         }
@@ -151,6 +154,7 @@ export const useUnCompleteTaskMutation = (task: TodoistTask) => {
         }),
         onMutate: async () => {
             await optimisticallyUpdateTask(queryClient, {
+                id: task.id,
                 is_completed: false
             })
         }
