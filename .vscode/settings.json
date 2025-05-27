@@ -4,6 +4,10 @@
     ],
     "files.associations": {
       "*.css": "tailwindcss"
+    },
+    "editor.formatOnSave": true,
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }
   
