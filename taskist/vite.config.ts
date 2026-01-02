@@ -1,18 +1,21 @@
 import { defineConfig, searchForWorkspaceRoot } from 'vite'
-import { join } from "path";
+import { join, resolve } from "path";
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   base: "/taskist",
-  resolve: {
+ resolve: {
     alias: {
-      // Replace the multipart upload module with a browser-safe stub
-      '@doist/todoist-api-typescript/dist/esm/utils/multipart-upload.js':
-        '/src/stubs/multipart-upload.ts',
-    },
+      path: 'path-browserify',
+      'fs': 'memfs', // or just mock it
+    }
   },
+  define: {
+    'process.env': {}
+  },
+
   server: {
     fs: {
       allow: [
