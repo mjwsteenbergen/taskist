@@ -1,6 +1,28 @@
 import { baseRestUrl, TodoistTask, TodoistProject, TodoistSection, baseSyncUrl, TodoistMoveArgs, createArg, TodoistCommand } from "./types";
+import { TodoistApi } from "@doist/todoist-api-typescript";
+
+type TodoistCursorResponse<T> =  {
+    nextCursor: string | null;
+    results: T[];
+}
+
+async function getAll<T>(func: (data: {
+    cursor?: string | null,
+}) => Promise<TodoistCursorResponse<T>>): Promise<T[]> { 
+    let cursor: string | undefined | null;
+    const items: T[] = [];
+    do {
+        const response = await func({
+            cursor
+        });
+        cursor = response.nextCursor;
+    } while(cursor !== null && cursor !== undefined)
+    return items;
+}
 
 export const getApi = (token: string) => {
+    const api = new TodoistApi(token)
+
     const auth = {
         "Authorization": "Bearer " + token
     }
@@ -13,58 +35,15 @@ export const getApi = (token: string) => {
     })
 
     return {
-        getTasks: () => fetch(baseRestUrl + "tasks", {
-            headers: auth
-        }).then(i => i.json())
-            .then(i => i as TodoistTask[]),
-        getProjects: () => fetch(baseRestUrl + "projects", {
-            headers: auth
-        }).then(i => i.json()).then(i => i as TodoistProject[]),
-        getSections: () => fetch(baseRestUrl + "sections", {
-            headers: auth
-        }).then(i => i.json()).then(i => i as TodoistSection[]),
-        createTask: (p: Partial<TodoistTask>) => fetch(baseRestUrl + "tasks", {
-            headers: {
-                ...auth,
-                "Content-Type": "application/json"
-            },
-            method: 'post',
-            body: JSON.stringify(p)
-        }).then(i => i.json()).then(i => i as TodoistTask),
-        updateTask: (fullPartial: Partial<TodoistTask> & Pick<TodoistTask, 'id'>) => {
-            const { id, ...rest } = fullPartial;
-            return fetch(baseRestUrl + "tasks/" + id, {
-                headers: {
-                    ...auth,
-                    "Content-Type": "application/json"
-                },
-                method: 'post',
-                body: JSON.stringify(rest)
-            }).then(i => i.json()).then(i => i as TodoistTask)
-        },
-        complete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/close", {
-            headers: {
-                ...auth,
-                "Content-Type": "application/json"
-            },
-            method: 'post',
-        }),
-        uncomplete: (id: string) => fetch(baseRestUrl + "tasks/" + id + "/reopen", {
-            headers: {
-                ...auth,
-                "Content-Type": "application/json"
-            },
-            method: 'post',
-        }),
-        createSection: (p: Partial<TodoistSection> & Pick<TodoistSection, "name" | "project_id">) => fetch(baseRestUrl + "sections", {
-            headers: {
-                ...auth,
-                "Content-Type": "application/json"
-            },
-            method: 'post',
-            body: JSON.stringify(p)
-        }).then(i => i.json()).then(i => i as TodoistSection),
+        getTasks: () => getAll(api.getTasks) as Promise<TodoistTask[]>,
+        getProjects: () => getAll(api.getProjects) as Promise<TodoistProject[]>,
+        getSections: () => getAll(api.getSections) as Promise<TodoistSection[]>,
+        createTask: api.addTask,
+        updateTask: api.updateTask,
+        complete: api.closeTask,
+        uncomplete: api.reopenTask,
+        createSection: api.addSection,
         sync,
-        moveTask: (args: TodoistMoveArgs) => sync([createArg("item_move", args)])
+        moveTask: api.moveTask
     }
 }

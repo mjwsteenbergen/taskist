@@ -11,11 +11,11 @@ export type TodoistTask = {
     url?: string;
     content: string;
     id: string;
-    is_completed: boolean;
-    order: number;
-    project_id: string;
-    section_id?: string;
-    parent_id?: string | null;
+    checked: boolean;
+    childOrder: number;
+    projectId: string;
+    sectionId?: string;
+    parentId?: string | null;
     due: TodoistTaskDue | null;
     priority: 1 | 2 | 3 | 4;
 };
@@ -23,14 +23,14 @@ export type TodoistTask = {
 export type TodoistProject = {
     id: string;
     name: string;
-    order: number;
+    childOrder: number;
     color?: string;
-    parent_id?: string | null;
+    parentId?: string | null;
 };
 
 export type TodoistSection = {
     id: string;
-    project_id: string;
+    projectId: string;
     name: string;
 }
 
@@ -62,5 +62,5 @@ export function createArg(type: TodoistCommand['type'], args: TodoistCommand['ar
 }
 
 export const baseUrl = "https://api.todoist.com";
-export const baseRestUrl = baseUrl + "/rest/v2/";
+export const baseRestUrl = baseUrl + "/rest/v1/";
 export const baseSyncUrl = baseUrl + "/sync/v9/";

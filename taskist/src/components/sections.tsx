@@ -75,7 +75,7 @@ export const InProgressSection = () => {
       .filter((i) =>
         sectionHasName(IN_PROGRESS, sections ?? [])
           .map((i) => i.id)
-          .includes(i.section_id ?? "")
+          .includes(i.sectionId ?? "")
       )
       .filter(notWaitingFor);
   }, [tasks, sections]);
@@ -107,7 +107,7 @@ export const TodaySection = () => {
     .filter(
       (i) =>
         !sectionHasName(IN_PROGRESS, sections ?? []).some(
-          (section) => section.id === i.section_id
+          (section) => section.id === i.sectionId
         )
     );
 
@@ -173,7 +173,7 @@ export const ReadyToPickupSection = () => {
   const { data: sections } = useTodoistSections();
   const tasksInSection = (tasks: TodoistTask[], sections: TodoistSection[]) => {
     const sectionIds = sections.map((i) => i.id);
-    return tasks.filter((i) => sectionIds.includes(i.section_id ?? ""));
+    return tasks.filter((i) => sectionIds.includes(i.sectionId ?? ""));
   };
 
   if (tasks === undefined || sections === undefined) {

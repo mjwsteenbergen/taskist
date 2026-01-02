@@ -18,7 +18,7 @@ export const sectionHasName = (name: string, sections: TodoistSection[]) =>
 
 export const useProjectFromTask = (task: TodoistTask) => {
   const { data: projects } = useTodoistProjects();
-  return (projects ?? []).find((i) => i.id === task.project_id);
+  return (projects ?? []).find((i) => i.id === task.projectId);
 };
 
 export const useSectionFromProject = (project?: TodoistProject) => {
@@ -26,7 +26,7 @@ export const useSectionFromProject = (project?: TodoistProject) => {
   if (project === undefined) {
     return [];
   }
-  return (sections ?? []).filter((i) => i.project_id === project.id);
+  return (sections ?? []).filter((i) => i.projectId === project.id);
 };
 
 export const useMoveToInProgress = (task: TodoistTask) => {
@@ -42,12 +42,11 @@ export const useMoveToInProgress = (task: TodoistTask) => {
       if (!inProgressSection) {
         inProgressSection = await api.createSection({
           name: IN_PROGRESS,
-          project_id: task.project_id,
+          projectId: task.projectId,
         });
       }
-      return await api.moveTask({
-        id: task.id,
-        section_id: inProgressSection.id,
+      return await api.moveTask(task.id, {
+        sectionId: inProgressSection.id,
       });
     },
     onSettled: () =>
@@ -57,7 +56,7 @@ export const useMoveToInProgress = (task: TodoistTask) => {
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        section_id: inProgressSection?.id,
+        sectionId: inProgressSection?.id,
       });
     },
   });
@@ -75,18 +74,17 @@ export const useToMoveReadyToPickUp = (task: TodoistTask) => {
       if (!readyToPickupSection) {
         readyToPickupSection = await api.createSection({
           name: READY_TO_PICKUP,
-          project_id: task.project_id,
+          projectId: task.projectId,
         });
       }
-      return await api.moveTask({
-        id: task.id,
-        section_id: readyToPickupSection.id,
+      return await api.moveTask(task.id, {
+        sectionId: readyToPickupSection.id,
       });
     },
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        section_id: readyToPickupSection?.id,
+        sectionId: readyToPickupSection?.id,
       });
     },
     onSettled: () => {
@@ -103,6 +101,6 @@ export const useToMoveReadyToPickUp = (task: TodoistTask) => {
 export const useMoveToDefaultSection = (task: TodoistTask) => {
   return useMoveTask({
     id: task.id,
-    project_id: task.project_id,
+    project_id: task.projectId,
   });
 };

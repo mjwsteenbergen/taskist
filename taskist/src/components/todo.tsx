@@ -47,18 +47,18 @@ export const Todo = ({
 
   const complete = useCompleteTaskMutation(task);
   const uncomplete = useUnCompleteTaskMutation(task);
-  const { mutate: toggleChecked } = task.is_completed ? uncomplete : complete;
+  const { mutate: toggleChecked } = task.checked ? uncomplete : complete;
 
   return (
     <div className={componentWrapperVariant({ big })}>
       <Checkbox
-        checked={task.is_completed}
+        checked={task.checked}
         classname={checkboxVariant({ big })}
         onCheckedChange={() => toggleChecked()}
       />
       <div>
         <TodoText
-          isCompleted={task.is_completed}
+          isCompleted={task.checked}
           big={big}
           text={task.content}
         />

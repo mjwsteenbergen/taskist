@@ -27,10 +27,10 @@ export const BASE_TASK: TodoistTask = {
   id: "1",
   content: "",
   labels: [],
-  order: 1,
-  project_id: "inbox",
+  childOrder: 1,
+  projectId: "inbox",
   due: null,
-  is_completed: false,
+  checked: false,
   priority: 4,
 };
 
@@ -84,7 +84,7 @@ export const useUpdateTask = (
   const api = useTodoistApiContext();
 
   return useMutation({
-    mutationFn: () => api.updateTask(task),
+    mutationFn: () => api.updateTask(task.id, task),
     onSettled: () =>
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
@@ -100,7 +100,7 @@ export const useMoveTask = (task: TodoistMoveArgs) => {
   const api = useTodoistApiContext();
 
   return useMutation({
-    mutationFn: () => api.moveTask(task),
+    mutationFn: () => api.moveTask(task.id, task as any),
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
@@ -108,9 +108,9 @@ export const useMoveTask = (task: TodoistMoveArgs) => {
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        project_id: task.project_id,
-        section_id: task.section_id,
-        parent_id: task.parent_id,
+        projectId: task.project_id,
+        sectionId: task.section_id,
+        parentId: task.parent_id,
       });
     },
   });
@@ -153,7 +153,7 @@ export const useCompleteTaskMutation = (task: TodoistTask) => {
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        is_completed: true,
+        checked: true,
       });
     },
   });
@@ -172,7 +172,7 @@ export const useUnCompleteTaskMutation = (task: TodoistTask) => {
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        is_completed: false,
+        checked: false,
       });
     },
   });
