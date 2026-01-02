@@ -12,7 +12,7 @@ import { Plus } from "iconoir-react";
 import { useCreateTodoMutation } from "./hooks/todoistHooks";
 import {
   InProgressSection,
-  NextUpSection,
+  ReadyToPickupSection,
   OverdueSection,
   TodaySection,
   WaitingForSection,
@@ -45,7 +45,7 @@ export const App = () => {
         ref={ref}
       >
         <WaitingForSection />
-        <NextUpSection />
+        <ReadyToPickupSection />
       </div>
     </>
   );

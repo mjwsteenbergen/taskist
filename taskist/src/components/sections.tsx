@@ -10,7 +10,7 @@ import {
 import {
   notWaitingFor,
   sectionHasName,
-  useToMoveNextUp,
+  useToMoveReadyToPickUp,
   useMoveToInProgress,
 } from "../hooks/aggregateTodoistHooks";
 import { TaskSection } from "./task-section";
@@ -32,12 +32,12 @@ const WaitingForBadge = ({ task }: { task: TodoistTask }) => {
   );
 };
 
-const MoveToNextUpBadge = ({
+const MoveToReadyToPickupBadge = ({
   task,
   children,
 }: PropsWithChildren<{ task: TodoistTask }>) => {
-  const { mutate: moveToNextUp } = useToMoveNextUp(task);
-  return <Badge onClick={() => moveToNextUp()}>{children}</Badge>;
+  const { mutate: moveToReadyToPickup } = useToMoveReadyToPickUp(task);
+  return <Badge onClick={() => moveToReadyToPickup()}>{children}</Badge>;
 };
 
 const MoveToInProgressBadge = ({ task }: { task: TodoistTask }) => {
@@ -86,9 +86,9 @@ export const InProgressSection = () => {
         return (
           <Todo big task={task} key={task.id}>
             <WaitingForBadge task={task} />
-            <MoveToNextUpBadge task={task}>
+            <MoveToReadyToPickupBadge task={task}>
               <NavArrowDown />
-            </MoveToNextUpBadge>
+            </MoveToReadyToPickupBadge>
           </Todo>
         );
       })}
@@ -168,7 +168,7 @@ export const WaitingForSection = () => {
   ) : null;
 };
 
-export const NextUpSection = () => {
+export const ReadyToPickupSection = () => {
   const { data: tasks } = useTodoistTasks();
   const { data: sections } = useTodoistSections();
   const tasksInSection = (tasks: TodoistTask[], sections: TodoistSection[]) => {
@@ -180,14 +180,14 @@ export const NextUpSection = () => {
     return <></>;
   }
 
-  const nextUpTasks = tasksInSection(
+  const readyToPickupTasks = tasksInSection(
     tasks,
-    sectionHasName("Next Up", sections)
+    sectionHasName("Ready To Pickup", sections)
   ).filter((i) => !i.labels.includes(TODAY));
 
-  return nextUpTasks.length > 0 ? (
-    <TaskSection name="Next up">
-      {nextUpTasks.map((task) => {
+  return readyToPickupTasks.length > 0 ? (
+    <TaskSection name="Ready To Pickup">
+      {readyToPickupTasks.map((task) => {
         return (
           <Todo task={task} key={task.id}>
             <ToggleTodayBadge task={task} />

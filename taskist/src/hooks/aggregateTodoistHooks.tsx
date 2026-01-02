@@ -7,7 +7,6 @@ import {
   useTodoistProjects,
   useMoveTask,
   optimisticallyUpdateTask,
-  NEXT_UP,
 } from "./todoistHooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTodoistApiContext } from "../context/TodoistApiContext";
@@ -64,30 +63,30 @@ export const useMoveToInProgress = (task: TodoistTask) => {
   });
 };
 
-export const useToMoveNextUp = (task: TodoistTask) => {
+export const useToMoveReadyToPickUp = (task: TodoistTask) => {
   const queryClient = useQueryClient();
   const project = useProjectFromTask(task);
   const sections = useSectionFromProject(project);
   const api = useTodoistApiContext();
-  let nextUpSection = sections.find((i) => i.name === NEXT_UP);
+  let readyToPickupSection = sections.find((i) => i.name === READY_TO_PICKUP);
 
   return useMutation({
     mutationFn: async () => {
-      if (!nextUpSection) {
-        nextUpSection = await api.createSection({
-          name: NEXT_UP,
+      if (!readyToPickupSection) {
+        readyToPickupSection = await api.createSection({
+          name: READY_TO_PICKUP,
           project_id: task.project_id,
         });
       }
       return await api.moveTask({
         id: task.id,
-        section_id: nextUpSection.id,
+        section_id: readyToPickupSection.id,
       });
     },
     onMutate: async () => {
       await optimisticallyUpdateTask(queryClient, {
         id: task.id,
-        section_id: nextUpSection?.id,
+        section_id: readyToPickupSection?.id,
       });
     },
     onSettled: () => {
