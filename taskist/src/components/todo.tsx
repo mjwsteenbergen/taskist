@@ -67,7 +67,7 @@ export const Todo = ({
             <Badge
               name={project.name}
               color={(project.color ?? "red") as any}
-              link={"https://todoist.com/app/project/" + project.id}
+              link={project.url}
             />
           )}
           {task.labels.map((i) => (

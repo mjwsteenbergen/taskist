@@ -7,10 +7,6 @@ export default defineConfig({
   plugins: [react()],
   base: "/taskist",
  resolve: {
-    alias: {
-      path: 'path-browserify',
-      'fs': 'memfs', // or just mock it
-    }
   },
   define: {
     'process.env': {}

@@ -26,6 +26,7 @@ export type TodoistProject = {
     childOrder: number;
     color?: string;
     parentId?: string | null;
+    url?: string;
 };
 
 export type TodoistSection = {
