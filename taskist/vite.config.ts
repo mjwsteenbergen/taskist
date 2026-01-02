@@ -6,6 +6,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: "/taskist",
+  resolve: {
+    alias: {
+      // Replace the multipart upload module with a browser-safe stub
+      '@doist/todoist-api-typescript/dist/esm/utils/multipart-upload.js':
+        '/src/stubs/multipart-upload.ts',
+    },
+  },
   server: {
     fs: {
       allow: [
